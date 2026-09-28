@@ -6,7 +6,9 @@ class SiemApplication {
   constructor() {
     window.SIEM_APP = this; // Immediately bind instance to global window
     this.data = SIEM_DATA;
-    this.apiUrl = 'http://localhost:5000/api';
+    const isSeparateFrontendPort = window.location.port === '8080' || window.location.port === '5500' || window.location.port === '3000';
+    this.apiUrl = isSeparateFrontendPort ? 'http://localhost:5000/api' : `${window.location.origin}/api`;
+
     this.isBackendConnected = false;
     this.currentView = 'dashboard';
     this.feedPaused = false;
