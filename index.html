@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIEM Log Dashboard | Security Operations Center</title>
+  <meta name="description" content="Next-generation SIEM Security Information & Event Management Operations Dashboard">
+  
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <div id="app">
+    <!-- ==========================================================================
+         SIDEBAR NAVIGATION
+         ========================================================================== -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">S</div>
+        <div class="brand-title">
+          <span class="brand-name">SIEM LOG</span>
+          <span class="brand-subtitle">SOC DASHBOARD</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Core Operations</div>
+        
+        <a class="nav-item active" data-view="dashboard">
+          <span>📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-view="logs">
+          <span>📜</span>
+          <span>Live Logs</span>
+          <span class="nav-badge blue">LIVE</span>
+        </a>
+        <a class="nav-item" data-view="alerts">
+          <span>🚨</span>
+          <span>Alerts</span>
+          <span class="nav-badge">24</span>
+        </a>
+        <a class="nav-item" data-view="rules">
+          <span>⚡</span>
+          <span>Rule Builder</span>
+        </a>
+        <a class="nav-item" data-view="threats">
+          <span>🎯</span>
+          <span>Threats</span>
+        </a>
+        <a class="nav-item" data-view="incidents">
+          <span>🛡️</span>
+          <span>Incidents</span>
+        </a>
+
+        <div class="nav-section-title">Knowledge & System</div>
+
+        <a class="nav-item" data-view="concepts">
+          <span>💡</span>
+          <span>Security Concepts</span>
+        </a>
+        <a class="nav-item" data-view="status">
+          <span>⚡</span>
+          <span>System Status</span>
+        </a>
+        <a class="nav-item" data-view="settings">
+          <span>⚙️</span>
+          <span>Settings & Profile</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="soc-mode-card">
+          <div class="soc-mode-info">
+            <span class="soc-mode-title">SOC Telemetry</span>
+            <span class="soc-mode-status">
+              <span class="pulse-dot-sm"></span> Active Ingestion
+            </span>
+          </div>
+          <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">4.2K EPS</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==========================================================================
+         MAIN CONTENT AREA & TOP HEADER
+         ========================================================================== -->
+    <main class="main-content">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-left">
+          <div class="status-pill warning" id="headerStatusPill">
+            <span class="status-dot"></span>
+            <span>SYSTEM ELEVATED THREAT LEVEL</span>
+          </div>
+
+          <div class="header-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="globalSearchInput" class="search-input" placeholder="Search logs, IPs, rule IDs...">
+            <span class="search-shortcut">/</span>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button class="btn-sim" onclick="SIEM_APP.switchView('settings')">
+            <span>💥 Attack Simulator</span>
+          </button>
+
+          <div class="notification-btn" onclick="SIEM_APP.switchView('alerts')">
+            <span>🔔</span>
+            <span class="notification-badge">3</span>
+          </div>
+
+          <div class="analyst-profile" onclick="SIEM_APP.switchView('settings')" style="cursor:pointer;" title="Click to customize profile">
+            <div class="avatar" id="headerAvatar">CA</div>
+            <div class="analyst-info">
+              <span class="analyst-name" id="headerAnalystName">Cybersecurity Analyst</span>
+              <span class="analyst-role" id="headerAnalystRole">Portfolio Security Developer</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW CONTAINER -->
+      <div class="view-container">
+
+        <!-- ==========================================================================
+             VIEW: DASHBOARD
+             ========================================================================== -->
+        <section id="view-dashboard" class="page-view active">
+          
+          <!-- Section Header -->
+          <div class="section-header">
+            <div>
+              <h1 class="section-title">Security Overview</h1>
+              <span class="section-subtitle">Real-time threat monitoring and event telemetry platform</span>
+            </div>
+          </div>
+
+          <!-- TOP METRIC CARDS GRID -->
+          <div class="overview-grid">
+            
+            <div class="glass-card metric-card">
+              <div class="metric-header">
+                <span class="metric-label">Total Events</span>
+                <div class="metric-icon-box">📊</div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-total-events">12,458</span>
+                <span class="trend-badge down">↓ 4.2%</span>
+              </div>
+              <div class="metric-footer">
+                <span class="metric-desc">Ingested in last 24H</span>
+                <span style="font-family:var(--font-mono); color:var(--cyan-highlight);">4,250 EPS</span>
+              </div>
+            </div>
+
+            <div class="glass-card metric-card high">
+              <div class="metric-header">
+                <span class="metric-label">Active Alerts</span>
+                <div class="metric-icon-box">🚨</div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-active-alerts">24</span>
+                <span class="trend-badge up">↑ 3 new</span>
+              </div>
+              <div class="metric-footer">
+                <span class="metric-desc">Pending SOC triage</span>
+                <span style="color:var(--severity-high); font-weight:600;">Requires Review</span>
+              </div>
+            </div>
+
+            <div class="glass-card metric-card purple">
+              <div class="metric-header">
+                <span class="metric-label">Threats Detected</span>
+                <div class="metric-icon-box">🎯</div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-threats-detected">8</span>
+                <span class="trend-badge down">↓ 2 mitigated</span>
+              </div>
+              <div class="metric-footer">
+                <span class="metric-desc">Active threat vectors</span>
+                <span style="color:var(--purple-accent); font-weight:600;">Matched IOCs</span>
+              </div>
+            </div>
+
+            <div class="glass-card metric-card critical">
+              <div class="metric-header">
+                <span class="metric-label">Critical Events</span>
+                <div class="metric-icon-box">⚡</div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-critical-events">3</span>
+                <span class="trend-badge up">Action Required</span>
+              </div>
+              <div class="metric-footer">
+                <span class="metric-desc">Immediate response needed</span>
+                <span style="color:var(--severity-critical); font-weight:700;">High Severity</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- THREAT PULSE BAR -->
+          <div class="threat-pulse-bar level-elevated" id="threatPulseBar">
+            <div class="pulse-info">
+              <div class="pulse-orb">
+                <span>⚡</span>
+              </div>
+              <div class="pulse-text-wrap">
+                <span class="pulse-title">Current Threat Posture</span>
+                <span class="pulse-level-name" id="pulseLevelName">ELEVATED</span>
+              </div>
+            </div>
+
+            <div class="pulse-steps">
+              <div class="step-pill" data-level="LOW" onclick="SIEM_APP.setThreatLevel('LOW')"></div>
+              <div class="step-pill" data-level="NORMAL" onclick="SIEM_APP.setThreatLevel('NORMAL')"></div>
+              <div class="step-pill active" data-level="ELEVATED" onclick="SIEM_APP.setThreatLevel('ELEVATED')"></div>
+              <div class="step-pill" data-level="HIGH" onclick="SIEM_APP.setThreatLevel('HIGH')"></div>
+              <div class="step-pill" data-level="CRITICAL" onclick="SIEM_APP.setThreatLevel('CRITICAL')"></div>
+            </div>
+
+            <div class="pulse-meta">
+              <div class="meta-item">
+                <span class="meta-val">142</span>
+                <span class="meta-lbl">Rules Active</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-val">0.4ms</span>
+                <span class="meta-lbl">Rule Latency</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- MAIN VISUAL GRID: SECURITY ACTIVITY CHART & LIVE FEED -->
+          <div class="dashboard-grid-2col">
+            
+            <!-- MAIN SECURITY ACTIVITY CHART -->
+            <div class="glass-panel" style="padding:1.5rem;">
+              <div class="chart-card-header">
+                <div>
+                  <h3 style="font-size:1.1rem; font-weight:700;">Security Activity</h3>
+                  <span style="font-size:0.78rem; color:var(--text-secondary);">Event ingestion telemetry vs alerts & threats</span>
+                </div>
+
+                <div class="timeframe-selector">
+                  <button class="tf-btn" onclick="SIEM_CHARTS.setTimeframe('1H')">1H</button>
+                  <button class="tf-btn" onclick="SIEM_CHARTS.setTimeframe('6H')">6H</button>
+                  <button class="tf-btn active" onclick="SIEM_CHARTS.setTimeframe('24H')">24H</button>
+                  <button class="tf-btn" onclick="SIEM_CHARTS.setTimeframe('7D')">7D</button>
+                </div>
+              </div>
+
+              <div class="chart-container">
+                <canvas id="activityChartCanvas"></canvas>
+              </div>
+
+              <div style="display:flex; gap:1.5rem; justify-content:center; margin-top:1rem; font-size:0.78rem;">
+                <div style="display:flex; align-items:center; gap:0.4rem; color:var(--text-secondary);">
+                  <span class="legend-dot" style="background:var(--electric-blue);"></span> Events Ingested
+                </div>
+                <div style="display:flex; align-items:center; gap:0.4rem; color:var(--text-secondary);">
+                  <span class="legend-dot" style="background:var(--severity-high);"></span> Active Alerts
+                </div>
+                <div style="display:flex; align-items:center; gap:0.4rem; color:var(--text-secondary);">
+                  <span class="legend-dot" style="background:var(--severity-critical);"></span> Confirmed Threats
+                </div>
+              </div>
+            </div>
+
+            <!-- LIVE SECURITY FEED -->
+            <div class="glass-panel" style="padding:1.5rem; display:flex; flex-direction:column; gap:1rem;">
+              <div class="chart-card-header" style="margin-bottom:0;">
+                <div>
+                  <h3 style="font-size:1.1rem; font-weight:700;">Live Security Feed</h3>
+                  <span style="font-size:0.78rem; color:var(--text-secondary);">Real-time SOC monitoring stream</span>
+                </div>
+                
+                <div class="feed-header-actions">
+                  <button class="icon-btn-sm" id="pauseFeedBtn" onclick="SIEM_APP.toggleFeedPause()" title="Pause Feed">⏸</button>
+                  <span class="status-badge" style="font-size:0.7rem;">● LIVE</span>
+                </div>
+              </div>
+
+              <div class="feed-container" id="liveFeedContainer">
+                <!-- Dynamically Rendered by JS -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- THREAT NETWORK MAP & THREAT RADAR -->
+          <div class="dashboard-grid-3col">
+            
+            <!-- THREAT NETWORK MAP -->
+            <div class="glass-panel" style="padding:1.5rem;">
+              <div class="chart-card-header">
+                <div>
+                  <h3 style="font-size:1.1rem; font-weight:700;">Attack Topology Map</h3>
+                  <span style="font-size:0.78rem; color:var(--text-secondary);">Visual network chain & event packet telemetry</span>
+                </div>
+                <span class="severity-pill HIGH">ACTIVE TELEMETRY</span>
+              </div>
+
+              <div id="networkMapContainer" class="network-map-container">
+                <!-- SVG Network Topology Rendered by JS -->
+              </div>
+            </div>
+
+            <!-- THREAT RADAR VISUALIZATION -->
+            <div class="glass-panel" style="padding:1.5rem; display:flex; flex-direction:column; align-items:center;">
+              <div class="chart-card-header" style="width:100%;">
+                <div>
+                  <h3 style="font-size:1.1rem; font-weight:700;">Threat Activity Radar</h3>
+                  <span style="font-size:0.78rem; color:var(--text-secondary);">Activity categorization sweep</span>
+                </div>
+              </div>
+
+              <div class="radar-wrapper">
+                <div class="radar-canvas-container">
+                  <div class="radar-sweep-line"></div>
+                  <canvas id="radarChartCanvas" width="220" height="220"></canvas>
+                </div>
+
+                <div class="radar-legend">
+                  <div class="radar-legend-item"><span class="legend-dot" style="background:var(--severity-low);"></span> Normal</div>
+                  <div class="radar-legend-item"><span class="legend-dot" style="background:var(--severity-medium);"></span> Suspicious</div>
+                  <div class="radar-legend-item"><span class="legend-dot" style="background:var(--severity-critical);"></span> Threat</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SECURITY TIMELINE & SOC 5 QUESTIONS -->
+          <div class="glass-panel" style="padding:1.5rem;">
+            <div class="chart-card-header">
+              <div>
+                <h3 style="font-size:1.1rem; font-weight:700;">Security Incident Timeline</h3>
+                <span style="font-size:0.78rem; color:var(--text-secondary);">How SIEM connects discrete logs into a correlated attack chain</span>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1.8fr; gap:2rem; margin-top:0.5rem;">
+              
+              <!-- Timeline Steps -->
+              <div class="timeline-container" id="timelineContainer">
+                <!-- Dynamically Rendered by JS -->
+              </div>
+
+              <!-- SOC 5 Questions Container -->
+              <div style="display:flex; flex-direction:column; gap:1rem;">
+                <h4 style="font-size:0.95rem; font-weight:700; color:var(--cyan-highlight);">SOC Analyst Decision Framework (The 5 Questions)</h4>
+                
+                <div class="soc-questions-card">
+                  <div class="q-box">
+                    <span class="q-num">1. What is happening?</span>
+                    <span class="q-answer">Brute force SSH dictionary spray</span>
+                  </div>
+                  <div class="q-box">
+                    <span class="q-num">2. Is there a threat?</span>
+                    <span class="q-answer">Yes, active adversary attempt</span>
+                  </div>
+                  <div class="q-box">
+                    <span class="q-num">3. How serious is it?</span>
+                    <span class="q-answer">CRITICAL (Targeting DB Server)</span>
+                  </div>
+                  <div class="q-box">
+                    <span class="q-num">4. Where did it come from?</span>
+                    <span class="q-answer">192.168.1.50 (Untrusted Workstation)</span>
+                  </div>
+                  <div class="q-box">
+                    <span class="q-num">5. What to investigate?</span>
+                    <span class="q-answer">Isolate IP & audit auth logs</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==========================================================================
+             VIEW: LIVE LOGS EXPLORER
+             ========================================================================== -->
+        <section id="view-logs" class="page-view">
+          <div class="section-header">
+            <div>
+              <h1 class="section-title">Log Explorer</h1>
+              <span class="section-subtitle">Search, filter, and inspect normalized security events</span>
+            </div>
+            <button class="btn-secondary" onclick="SIEM_APP.showToast('Log export downloaded (JSON format)', 'SUCCESS')">
+              📥 Export Logs (JSON)
+            </button>
+          </div>
+
+          <div class="glass-panel" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
+            
+            <div class="alert-filter-bar">
+              <div class="filter-pills">
+                <button class="filter-pill active" data-filter="ALL" onclick="SIEM_APP.filterLogs('ALL')">All Logs</button>
+                <button class="filter-pill" data-filter="CRITICAL" onclick="SIEM_APP.filterLogs('CRITICAL')">CRITICAL</button>
+                <button class="filter-pill" data-filter="HIGH" onclick="SIEM_APP.filterLogs('HIGH')">HIGH</button>
+                <button class="filter-pill" data-filter="MEDIUM" onclick="SIEM_APP.filterLogs('MEDIUM')">MEDIUM</button>
+                <button class="filter-pill" data-filter="LOW" onclick="SIEM_APP.filterLogs('LOW')">LOW</button>
+                <button class="filter-pill" data-filter="INFO" onclick="SIEM_APP.filterLogs('INFO')">INFO</button>
+              </div>
+
+              <span style="font-size:0.8rem; color:var(--text-muted);" id="logsCountBadge">Showing 6 of 12,458 ingested logs</span>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="log-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Source IP</th>
+                    <th>Destination IP</th>
+                    <th>User</th>
+                    <th>Event Category</th>
+                    <th>Severity</th>
+                  </tr>
+                </thead>
+                <tbody id="logsTbody">
+                  <!-- Dynamically Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW: ALERTS MANAGEMENT
+             ========================================================================== -->
+        <section id="view-alerts" class="page-view">
+          <div class="section-header">
+            <div>
+              <h1 class="section-title">Alert Management</h1>
+              <span class="section-subtitle">Review, investigate, and triage active security alerts</span>
+            </div>
+            <button class="btn-primary" onclick="SIEM_APP.triggerScenario('bruteForce')">
+              ⚡ Trigger Test Alert
+            </button>
+          </div>
+
+          <div class="alert-filter-bar">
+            <div class="filter-pills">
+              <button class="filter-pill active" data-filter="ALL" onclick="SIEM_APP.renderAlerts('ALL')">All Severity</button>
+              <button class="filter-pill" data-filter="CRITICAL" onclick="SIEM_APP.renderAlerts('CRITICAL')">CRITICAL</button>
+              <button class="filter-pill" data-filter="HIGH" onclick="SIEM_APP.renderAlerts('HIGH')">HIGH</button>
+              <button class="filter-pill" data-filter="MEDIUM" onclick="SIEM_APP.renderAlerts('MEDIUM')">MEDIUM</button>
+              <button class="filter-pill" data-filter="LOW" onclick="SIEM_APP.renderAlerts('LOW')">LOW</button>
+              <button class="filter-pill" data-filter="INFO" onclick="SIEM_APP.renderAlerts('INFO')">INFO</button>
+            </div>
+          </div>
+
+          <div class="alerts-grid" id="alertsGrid">
+            <!-- Dynamically Rendered by JS -->
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW: CUSTOM DETECTION RULE BUILDER
+             ========================================================================== -->
+        <section id="view-rules" class="page-view">
+          <div class="section-header">
+            <div>
+              <h1 class="section-title">Custom Detection Rule Builder</h1>
+              <span class="section-subtitle">Create, test, and compile SIGMA / YARA rule signatures</span>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1.4fr 1.6fr; gap:1.5rem;">
+            
+            <!-- Left: Rule List & Library -->
+            <div class="glass-panel" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="font-size:1.1rem; font-weight:700;">Active Detection Engine Rules</h3>
+                <span class="status-badge">142 Rules Active</span>
+              </div>
+
+              <div style="display:flex; flex-direction:column; gap:1rem; max-height:600px; overflow-y:auto;" id="rulesListContainer">
+                <!-- Dynamically Rendered by JS -->
+              </div>
+            </div>
+
+            <!-- Right: Rule Visual Form & SIGMA Generator -->
+            <div style="display:flex; flex-direction:column; gap:1.5rem;">
+              
+              <div class="glass-panel" style="padding:1.5rem; display:flex; flex-direction:column; gap:1rem;">
+                <h3 style="font-size:1.1rem; font-weight:700; color:var(--cyan-highlight);">📝 Create New SIGMA Rule</h3>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                  <div>
+                    <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Rule Title</label>
+                    <input type="text" id="ruleFormTitle" class="search-input" style="width:100%; padding-left:0.85rem;" value="SSH Dictionary Spray Detection" oninput="SIEM_APP.updateSigmaPreview()">
+                  </div>
+                  <div>
+                    <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Severity Level</label>
+                    <select id="ruleFormSeverity" class="search-input" style="width:100%; padding-left:0.85rem;" onchange="SIEM_APP.updateSigmaPreview()">
+                      <option value="CRITICAL">CRITICAL</option>
+                      <option value="HIGH">HIGH</option>
+                      <option value="MEDIUM">MEDIUM</option>
+                      <option value="LOW">LOW</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1rem;">
+                  <div>
+                    <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Log Source Product</label>
+                    <input type="text" id="ruleFormLogSource" class="search-input" style="width:100%; padding-left:0.85rem;" value="syslog.auth" oninput="SIEM_APP.updateSigmaPreview()">
+                  </div>
+                  <div>
+                    <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Threshold Limit</label>
+                    <input type="number" id="ruleFormThreshold" class="search-input" style="width:100%; padding-left:0.85rem;" value="15">
+                  </div>
+                  <div>
+                    <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">MITRE ATT&CK Tag</label>
+                    <input type="text" id="ruleFormMitre" class="search-input" style="width:100%; padding-left:0.85rem;" value="T1110.001" oninput="SIEM_APP.updateSigmaPreview()">
+                  </div>
+                </div>
+
+                <div>
+                  <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Condition Logic String</label>
+                  <input type="text" id="ruleFormCondition" class="search-input" style="width:100%; padding-left:0.85rem; font-family:var(--font-mono);" value="event == 'SSH_AUTH_FAIL' AND attempts >= 15" oninput="SIEM_APP.updateSigmaPreview()">
+                </div>
+
+                <div>
+                  <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Rule Description</label>
+                  <input type="text" id="ruleFormDesc" class="search-input" style="width:100%; padding-left:0.85rem;" value="Detects 15+ SSH auth failures in 60s window">
+                </div>
+
+                <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+                  <button class="btn-primary" onclick="SIEM_APP.saveNewRule()">⚡ Compile & Deploy Rule</button>
+                  <button class="btn-secondary" onclick="SIEM_APP.testRuleSandbox()">🧪 Run Sandbox Test</button>
+                </div>
+
+                <div id="sandboxResults" style="margin-top:0.5rem;"></div>
+              </div>
+
+              <!-- SIGMA YAML Preview Box -->
+              <div class="glass-panel" style="padding:1.25rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                  <span style="font-size:0.8rem; font-weight:700; color:var(--cyan-highlight);">📄 Compiled SIGMA Specification (YAML)</span>
+                  <button class="btn-secondary" style="font-size:0.75rem; padding:0.25rem 0.5rem;" onclick="SIEM_APP.showToast('SIGMA Rule copied to clipboard!', 'SUCCESS')">📋 Copy YAML</button>
+                </div>
+                <div class="code-block" id="sigmaRulePreview" style="max-height:220px; overflow-y:auto; font-size:0.75rem;">
+                  <!-- Dynamically rendered -->
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW: INCIDENTS MANAGEMENT
+             ========================================================================== -->
+        <section id="view-incidents" class="page-view">
+          <div class="section-header">
+            <div>
+              <h1 class="section-title">Incident Response & SOAR Playbooks</h1>
+              <span class="section-subtitle">Correlated threat campaigns, affected assets, and automated containment actions</span>
+            </div>
+            <button class="btn-primary" onclick="SIEM_APP.showToast('SOAR Automation Engine Active', 'SUCCESS')">
+              🛡️ Playbooks Armed
+            </button>
+          </div>
+
+          <div class="glass-panel" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:1.1rem; font-weight:700;">Active Security Incident Campaigns</h3>
+              <span class="status-badge" style="background:rgba(239,68,68,0.15); color:var(--severity-critical);">3 Correlated Incidents</span>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:1.25rem;" id="incidentsContainer">
+              <!-- Dynamically Rendered by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW: THREAT INTELLIGENCE
+             ========================================================================== -->
+        <section id="view-threats" class="page-view">
+          <div class="section-header">
+            <div>
+              <h1 class="section-title">Threat Intelligence & IOC Feeds</h1>
+              <span class="section-subtitle">Global indicators of compromise and MITRE ATT&CK® matrix taxonomy</span>
+            </div>
+          </div>
+
+          <div class="glass-panel" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h3 style="font-size:1.1rem; font-weight:700;">Active Threat Intelligence Indicators</h3>
+              <span class="status-badge">MISP / STIX / TAXII Feed Synced</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:1.25rem;">
+              <div class="glass-card" style="border-left:4px solid var(--severity-critical);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+                  <span class="severity-pill CRITICAL">CRITICAL IOC</span>
+                  <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">IP Signature</span>
+                </div>
+                <h4 style="color:#fff; font-size:0.95rem; margin-bottom:0.25rem;">45.142.214.10</h4>
+                <p style="font-size:0.78rem; color:var(--text-secondary);">Known SSH Botnet C2 Node matched in AlienVault OTX Feed.</p>
+              </div>
+
+              <div class="glass-card" style="border-left:4px solid var(--severity-high);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.4rem;">
+                  <span class="severity-pill HIGH">HIGH IOC</span>
+                  <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">Tor Exit Node</span>
+                </div>
+                <h4 style="color:#fff; font-size:0.95rem; margin-bottom:0.25rem;">185.220.101.4</h4>
+                <p style="font-size:0.78rem; color:var(--text-secondary);">Verified Tor exit relay flagged for automated data exfiltration.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW: SECURITY CONCEPTS
+             ========================================================================== -->
+        <section id="view-concepts" class="page-view">
+          <div class="section-header">
+            <div>
+              <h1 class="section-title">Security Concepts & Architecture</h1>
+              <span class="section-subtitle">Interactive educational guide explaining core SIEM building blocks</span>
+            </div>
+          </div>
+
+          <div class="concepts-grid" id="conceptsGrid">
+            <!-- Dynamically Rendered by JS -->
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW: SYSTEM STATUS
+             ========================================================================== -->
+        <section id="view-status" class="page-view">
+          <div class="section-header">
+            <div>
+              <h1 class="section-title">SIEM Infrastructure Health</h1>
+              <span class="section-subtitle">Ingestion engine, rule latency, and storage cluster status</span>
+            </div>
+          </div>
+
+          <div class="glass-panel" style="padding:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+              <div>
+                <h3 style="font-size:1.1rem; font-weight:700;">System Components Status</h3>
+                <span style="font-size:0.78rem; color:var(--text-secondary);">Real-time health telemetry</span>
+              </div>
+              <span class="status-pill">
+                <span class="status-dot"></span> All Core Engines Operational
+              </span>
+            </div>
+
+            <div class="status-component-list" id="statusListContainer">
+              <!-- Dynamically Rendered by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================================================
+             VIEW: SETTINGS & ATTACK SIMULATOR
+             ========================================================================== -->
+        <section id="view-settings" class="page-view">
+          <div class="section-header">
+            <div>
+              <h1 class="section-title">Settings & Analyst Profile</h1>
+              <span class="section-subtitle">Customize analyst details and simulate security incidents</span>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+            
+            <!-- Profile Customization Panel -->
+            <div class="glass-panel" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
+              <h3 style="font-size:1.1rem; font-weight:700; color:var(--electric-blue);">👤 Analyst Portfolio Profile</h3>
+              <p style="font-size:0.82rem; color:var(--text-secondary);">Set your name and title to display on your portfolio dashboard.</p>
+
+              <div>
+                <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Your Full Name</label>
+                <input type="text" id="settingProfileName" class="search-input" style="width:100%; padding-left:0.85rem;" placeholder="e.g. John Doe">
+              </div>
+
+              <div>
+                <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.25rem;">Your Portfolio Role / Title</label>
+                <input type="text" id="settingProfileRole" class="search-input" style="width:100%; padding-left:0.85rem;" placeholder="e.g. Cybersecurity Student & Analyst">
+              </div>
+
+              <button class="btn-primary" style="margin-top:0.5rem;" onclick="SIEM_APP.updateProfile()">💾 Save Profile Details</button>
+            </div>
+
+            <!-- Attack Simulator Presets -->
+            <div class="glass-panel" style="padding:1.5rem; display:flex; flex-direction:column; gap:1.25rem;">
+              <h3 style="font-size:1.1rem; font-weight:700; color:var(--purple-accent);">💥 Attack Scenario Presets</h3>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="glass-card" onclick="SIEM_APP.triggerScenario('bruteForce')" style="cursor:pointer;">
+                  <h4 style="color:var(--severity-critical); font-size:0.95rem; margin-bottom:0.35rem;">💥 Brute Force Attack</h4>
+                  <p style="font-size:0.75rem; color:var(--text-secondary);">Password spray on DB server.</p>
+                </div>
+
+                <div class="glass-card" onclick="SIEM_APP.triggerScenario('ransomware')" style="cursor:pointer;">
+                  <h4 style="color:var(--severity-high); font-size:0.95rem; margin-bottom:0.35rem;">🛡️ Ransomware Activity</h4>
+                  <p style="font-size:0.75rem; color:var(--text-secondary);">Mass file modification & shadow copy deletion.</p>
+                </div>
+
+                <div class="glass-card" onclick="SIEM_APP.triggerScenario('portScan')" style="cursor:pointer;">
+                  <h4 style="color:var(--severity-medium); font-size:0.95rem; margin-bottom:0.35rem;">🌊 Reconnaissance Scan</h4>
+                  <p style="font-size:0.75rem; color:var(--text-secondary);">Nmap TCP SYN probe.</p>
+                </div>
+
+                <div class="glass-card" onclick="SIEM_APP.resetBaseline()" style="cursor:pointer;">
+                  <h4 style="color:var(--severity-low); font-size:0.95rem; margin-bottom:0.35rem;">✨ Reset Baseline</h4>
+                  <p style="font-size:0.75rem; color:var(--text-secondary);">Reset threat posture to Normal.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       GLOBAL MODAL DIALOG
+       ========================================================================== -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <button class="modal-close-btn" onclick="SIEM_APP.closeModal()">✕</button>
+      <h2 id="modalTitle" style="font-size:1.2rem; font-weight:700; margin-bottom:1.25rem;">Modal Header</h2>
+      <div id="modalBody">
+        <!-- Content injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       TOAST NOTIFICATIONS CONTAINER
+       ========================================================================== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/data.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/network-map.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

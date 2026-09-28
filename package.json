@@ -1,0 +1,25 @@
+{
+  "name": "siem-log-dashboard",
+  "version": "1.0.0",
+  "description": "Enterprise SIEM Security Operations Center Dashboard & Node.js Express REST API with SQLite Database",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "siem",
+    "cybersecurity",
+    "soc",
+    "express",
+    "sqlite",
+    "sigma-rules"
+  ],
+  "author": "Cybersecurity Analyst",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "sqlite3": "^5.1.7"
+  }
+}
